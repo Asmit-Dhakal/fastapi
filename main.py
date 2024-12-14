@@ -4,11 +4,10 @@ from pydantic import BaseModel
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
-from pymongo import Mongoclient
-
-conn =Mongoclient()
+from pymongo import MongoClient
 
 # Models for Document and Folder
+
 class Folder(BaseModel):
     folder_id: str
     name: object
@@ -23,7 +22,7 @@ class DocumentData(BaseModel):
 
 app = FastAPI()
 
-# Endpoint for root
+# Endpoint for
 app.mount("/static", StaticFiles(directory="static"), name="static")
 templates = Jinja2Templates(directory="templates")
 @app.get("/",response_class=HTMLResponse)
