@@ -15,23 +15,21 @@ app = FastAPI()
 
 #Request Model
 class FolderRequest(BaseModel):
-    folder_id: str
-    name: str
+    folder_name: str
 
 class DocumentRequest(BaseModel):
-    document_id: str
-    name: str
+    document_name: str
     folder_id: str
 
 # Response
 class FolderResponse(BaseModel):
     folder_id: str
-    name: str
+    folder_name: str
     archive: bool
 
 class DocumentResponse(BaseModel):
     document_id: str
-    name: str
+    document_name: str
     folder_id: str
     archive: bool
 
@@ -83,7 +81,7 @@ async def create_Folder(folder: FolderRequest):
     folders_db[unique_folder_id] = folder.dict()
     return FolderResponse(         # Return FolderResponse
         folder_id=unique_folder_id,
-        name=folder.name,
+        folder_name=folder.folder_name,
         archive=False
     )
 
@@ -100,7 +98,7 @@ async def create_Document(document: DocumentRequest):
     # Store
     document_data = {
         "document_id": unique_document_id,
-        "name": document.name,
+        "document_name": document.document_name,
         "folder_id": document.folder_id,
         "archive": False # initial archive
     }
@@ -109,7 +107,7 @@ async def create_Document(document: DocumentRequest):
 
     return DocumentResponse(
         document_id=unique_document_id,
-        name=document.name,
+        document_name=document.document_name,
         folder_id=document.folder_id,
         archive=False # initial archive
     )
