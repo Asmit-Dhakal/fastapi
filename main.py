@@ -21,7 +21,7 @@ class DocumentRequest(BaseModel):
     document_name: str
     folder_id: str
 
-# Response
+# Response Model
 class FolderResponse(BaseModel):
     folder_id: str
     folder_name: str
@@ -113,20 +113,19 @@ async def create_Document(document: DocumentRequest):
     )
 
 @app.get("/folders/")
-async def get_all_folders():
-    # Get all folders
-    return [{"folder_id": folder_id, "name": folder_data["name"]} for folder_id, folder_data in folders_db.items()]
+async def get_folder():
+    return [{"folder_id": folder_id, "folder_name": folder_data["folder_name"]} for folder_id, folder_data in folders_db.items()]
 
 
 @app.get("/documents/{folder_id}")
 async def get_documents_in_folder(folder_id: str):
-    # Check if the folder exists
+    # Check  the folder
     if folder_id not in folders_db:
         raise HTTPException(status_code=404, detail="Folder not found")
 
-    # Get all documents for the given folder
+    # documents for  folder
     documents_in_folder = [
-        {"document_id": document_data["document_id"], "name": document_data["name"]}
+        {"document_id": document_data["document_id"], "name": document_data["document_name"]}
         for document_data in documents_db.values() if document_data["folder_id"] == folder_id
     ]
 
