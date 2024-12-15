@@ -89,16 +89,33 @@ async def create_Folder(folder: FolderRequest):
 
 
 @app.post("/document/")
-async def create_Document(document: DocumentResponse):
-   if document.document_id in documents_db:
-       raise HTTPException(status_code=404, detail="Document already there")
-   elif document.document_id not in folders_db:
-       raise HTTPException(status_code=404, detail="Document not found")
-   elif document.folder_id not in folders_db:
-       raise HTTPException(status_code=404, detail="Folder not found")
-   else:
-       documents_db[document.document_id] = document.dict()
-       return document
+async def create_Document(document: DocumentRequest):
+
+    unique_document_id = str(uuid.uuid4())
+
+    # Check folder
+    if document.folder_id not in folders_db:
+        raise HTTPException(status_code=404, detail="Folder not found")
+
+    # Store
+    document_data = {
+        "document_id": unique_document_id,
+        "name": document.name,
+        "folder_id": document.folder_id,
+        "archive": False # initial archive
+    }
+
+    # Store the document in the
+    documents_db[unique_document_id] = document_data
+
+    # Return the document
+    return DocumentResponse(
+        document_id=unique_document_id,
+        name=document.name,
+        folder_id=document.folder_id,
+        archive=False # initial archive
+    )
+
 
 
 
