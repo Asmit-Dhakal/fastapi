@@ -10,15 +10,17 @@ from pymongo import MongoClient
 
 class Folder(BaseModel):
     folder_id: str
-    name: object
+    name: str
     archive: bool
 
 class DocumentData(BaseModel):
-    ID: object
+    document_id: str
     name: str
-    folder_id: Folder | None = None
+    folder_id: str
     archive: bool
 
+class ArchiveStatusUpdate(BaseModel):
+    is_archived: bool
 
 app = FastAPI()
 
