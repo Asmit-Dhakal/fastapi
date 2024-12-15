@@ -133,21 +133,6 @@ async def get_folder_by_name(folder_name: str):
     raise HTTPException(status_code=404, detail="Folder not found")
 
 
-@app.get("/documents/{folder_id}")
-async def get_documents_in_folder(folder_id: str):
-    # Check  the folder
-    if folder_id not in folders_db:
-        raise HTTPException(status_code=404, detail="Folder not found")
-
-    # documents for  folder
-    documents_in_folder = [
-        {"document_id": document_data["document_id"], "name": document_data["document_name"]}
-        for document_data in documents_db.values() if document_data["folder_id"] == folder_id
-    ]
-
-    return documents_in_folder
-
-
 
 
 @app.get("/items/{item_id}")
