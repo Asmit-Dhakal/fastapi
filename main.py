@@ -105,16 +105,34 @@ async def create_Document(document: DocumentRequest):
         "archive": False # initial archive
     }
 
-    # Store the document in the
     documents_db[unique_document_id] = document_data
 
-    # Return the document
     return DocumentResponse(
         document_id=unique_document_id,
         name=document.name,
         folder_id=document.folder_id,
         archive=False # initial archive
     )
+
+@app.get("/folders/")
+async def get_all_folders():
+    # Get all folders
+    return [{"folder_id": folder_id, "name": folder_data["name"]} for folder_id, folder_data in folders_db.items()]
+
+
+@app.get("/documents/{folder_id}")
+async def get_documents_in_folder(folder_id: str):
+    # Check if the folder exists
+    if folder_id not in folders_db:
+        raise HTTPException(status_code=404, detail="Folder not found")
+
+    # Get all documents for the given folder
+    documents_in_folder = [
+        {"document_id": document_data["document_id"], "name": document_data["name"]}
+        for document_data in documents_db.values() if document_data["folder_id"] == folder_id
+    ]
+
+    return documents_in_folder
 
 
 
