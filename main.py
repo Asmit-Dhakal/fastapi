@@ -33,6 +33,7 @@ class DocumentResponse(BaseModel):
     folder_id: str
     archive: bool
 
+# Archive Model
 class ArchiveStatusUpdate(BaseModel):
     is_archived: bool
 
