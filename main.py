@@ -78,7 +78,14 @@ async def create_Folder(folder: FolderRequest):
     except FileExistsError:
         raise HTTPException(status_code=404, detail="Folder already there")
 
-    folders_db[unique_folder_id] = folder.dict()
+    # Store
+    folder_data = {
+        "folder_id": unique_folder_id,
+        "folder_name": folder.name,
+        "archive": folder.archive,
+    }
+
+    folders_db[unique_folder_id] = folder_data
     return FolderResponse(         # Return FolderResponse
         folder_id=unique_folder_id,
         folder_name=folder.folder_name,
