@@ -2,6 +2,7 @@ import os
 from fastapi import FastAPI, Request,HTTPException
 from typing import Union
 from pydantic import BaseModel
+import uuid
 
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
@@ -67,18 +68,24 @@ folders_db = {}
 documents_db = {}
 # folder create
 @app.post("/folder/")
-async def create_Folder(folder: FolderResponse):
-    if folder.folder_id  in folders_db:
+async def create_Folder(folder: FolderRequest):
+    unique_folder_id = str(uuid.uuid4())
+
+    if unique_folder_id  in folders_db:
         raise HTTPException(status_code=404, detail="Folder already there")
 
-    folder_path =os.path.join(Local_Storage, folder.folder_id)
+    folder_path =os.path.join(Local_Storage,  unique_folder_id)
     try:
         os.makedirs(folder_path)
     except FileExistsError:
         raise HTTPException(status_code=404, detail="Folder already there")
 
-    folders_db[folder.folder_id] = folder.dict()
-    return folder
+    folders_db[unique_folder_id] = folder.dict()
+    return FolderResponse(         # Return FolderResponse
+        folder_id=unique_folder_id,
+        name=folder.name,
+        archive=False
+    )
 
 
 @app.post("/document/")
