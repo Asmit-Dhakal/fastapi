@@ -2,6 +2,7 @@ import os
 from fastapi import FastAPI, Request,HTTPException
 from typing import Union
 from pydantic import BaseModel
+
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
@@ -15,13 +16,11 @@ app = FastAPI()
 class FolderRequest(BaseModel):
     folder_id: str
     name: str
-    archive: bool
 
 class DocumentRequest(BaseModel):
     document_id: str
     name: str
     folder_id: str
-    archive: bool
 
 # Response
 class FolderResponse(BaseModel):
@@ -44,12 +43,19 @@ Local_Storage = "./local_folders"
 if not os.path.exists(Local_Storage): os.makedirs((Local_Storage))
 
 
+
+""""
 # Endpoint for
 app.mount("/static", StaticFiles(directory="static"), name="static")
 templates = Jinja2Templates(directory="templates")
+
+
 @app.get("/",response_class=HTMLResponse)
 async def read_item(request: Request):
     return templates.TemplateResponse("index.html", context={"request": request})
+    
+"""
+
 
 # Endpoint for hello with name and age
 @app.get("/hello/{name}")
@@ -61,7 +67,7 @@ folders_db = {}
 documents_db = {}
 # folder create
 @app.post("/folder/")
-async def create_Folder(folder: FolderRequest):
+async def create_Folder(folder: FolderResponse):
     if folder.folder_id  in folders_db:
         raise HTTPException(status_code=404, detail="Folder already there")
 
@@ -86,6 +92,7 @@ async def create_Document(document: DocumentResponse):
    else:
        documents_db[document.document_id] = document.dict()
        return document
+
 
 
 @app.get("/items/{item_id}")
