@@ -11,7 +11,7 @@ folders_collection, documents_collection = get_database()
 
 # Create Folder
 @app.post("/folder/", response_model=FolderResponse)
-async def createFolder(folder: FolderRequest):
+async def create_folder(folder: FolderRequest):
     # Check if folder with the same name already exists
     folder_exists = folders_collection.find_one({"folder_name": folder.folder_name})
     if folder_exists:
@@ -19,7 +19,7 @@ async def createFolder(folder: FolderRequest):
 
     # Insert folder data into the database
     folder_data = {
-        "folder_name": folder.folder_name.lower(),
+        "folder_name": folder.folder_name.lower(), # (should be unique or not ) ?
         "archive": False
     }
     result = folders_collection.insert_one(folder_data)
@@ -46,7 +46,7 @@ async def get_all_folders():
 
 # Get Folder by Name
 @app.get("/folders/{folder_name}", response_model=Optional[FolderResponse])
-async def getFolderByName(folder_name: str):
+async def get_folder_by_name(folder_name: str):
     # Find folder by name
     folder = folders_collection.find_one({"folder_name": folder_name})
 
@@ -120,7 +120,7 @@ async def update_folder_archive_status(folder_id: str, status_update: ArchiveSta
 
 # Create Document
 @app.post("/document/", response_model=DocumentResponse)
-async def createDocument(document: DocumentRequest):
+async def create_document(document: DocumentRequest):
     # Validate folder exists
     folder = folders_collection.find_one({"_id": ObjectId(document.folder_id)})
     if not folder:
@@ -144,7 +144,7 @@ async def createDocument(document: DocumentRequest):
 
 # Get Document by Name
 @app.get("/documents/{document_name}", response_model=Optional[DocumentResponse])
-async def getDocumentByName(document_name: str):
+async def get_document_by_name(document_name: str):
     # Search for the document by name (case-insensitive)
     document = documents_collection.find_one({"document_name": document_name.lower()})
     if not document:
