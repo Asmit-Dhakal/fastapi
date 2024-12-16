@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="568ba302-c24a-45ae-b6c8-cd909d5769d6" name="Changes" comment="update and delete unnecessary folder" />
+    <list default="true" id="568ba302-c24a-45ae-b6c8-cd909d5769d6" name="Changes" comment="update main.py" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -114,7 +114,7 @@
       <workItem from="1734328048694" duration="3032000" />
       <workItem from="1734335309098" duration="4939000" />
       <workItem from="1734349986351" duration="4150000" />
-      <workItem from="1734361639241" duration="673000" />
+      <workItem from="1734361639241" duration="1034000" />
     </task>
     <task id="LOCAL-00001" summary="commit">
       <option name="closed" value="true" />
@@ -284,7 +284,31 @@
       <option name="project" value="LOCAL" />
       <updated>1734362250392</updated>
     </task>
-    <option name="localTasksCounter" value="22" />
+    <task id="LOCAL-00022" summary="update and delete unnecessary folder">
+      <option name="closed" value="true" />
+      <created>1734362365042</created>
+      <option name="number" value="00022" />
+      <option name="presentableId" value="LOCAL-00022" />
+      <option name="project" value="LOCAL" />
+      <updated>1734362365042</updated>
+    </task>
+    <task id="LOCAL-00023" summary="update main.py">
+      <option name="closed" value="true" />
+      <created>1734362470165</created>
+      <option name="number" value="00023" />
+      <option name="presentableId" value="LOCAL-00023" />
+      <option name="project" value="LOCAL" />
+      <updated>1734362470165</updated>
+    </task>
+    <task id="LOCAL-00024" summary="update main.py">
+      <option name="closed" value="true" />
+      <created>1734362554495</created>
+      <option name="number" value="00024" />
+      <option name="presentableId" value="LOCAL-00024" />
+      <option name="project" value="LOCAL" />
+      <updated>1734362554495</updated>
+    </task>
+    <option name="localTasksCounter" value="25" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -308,7 +332,8 @@
     <MESSAGE value="folder archive update" />
     <MESSAGE value="delete of folder completed" />
     <MESSAGE value="update and delete unnecessary folder" />
-    <option name="LAST_COMMIT_MESSAGE" value="update and delete unnecessary folder" />
+    <MESSAGE value="update main.py" />
+    <option name="LAST_COMMIT_MESSAGE" value="update main.py" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/FastAPIProject$FastAPIProject.coverage" NAME="FastAPIProject Coverage Results" MODIFIED="1734276068713" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
