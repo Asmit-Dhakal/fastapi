@@ -76,6 +76,7 @@ async def delete_folder(folder_id: str):
     result = folders_collection.delete_one({"_id": str(folder_id)})
 
 
+
     # Return the deleted folder details
     return FolderResponse(
         folder_id=str(folder["_id"]),
