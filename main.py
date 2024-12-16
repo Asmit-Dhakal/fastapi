@@ -143,7 +143,6 @@ async def createDocument(document: DocumentRequest):
     )
 
 
-
 # Get Document by Name
 @app.get("/documents/{document_name}", response_model=Optional[DocumentResponse])
 async def getDocumentByName(document_name: str):
