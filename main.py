@@ -90,3 +90,71 @@ async def get_document_by_name(document_name: str):
         archive=document["archive"]
     )
 
+# Update Folder Archive Status
+@app.patch("/folder/{folder_id}/archive", response_model=FolderResponse)
+async def update_folder_archive_status(folder_id: str, status_update: ArchiveStatusUpdate):
+    # Update archive status in the database
+    result = folders_collection.update_one(
+        {"_id": ObjectId(folder_id)},
+        {"$set": {"archive": status_update.is_archived}}
+    )
+
+    # Check if folder exists
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Folder not found")
+
+    # Return updated folder details
+    folder = folders_collection.find_one({"_id": ObjectId(folder_id)})
+    return FolderResponse(
+        folder_id=str(folder["_id"]),
+        folder_name=folder["folder_name"],
+        archive=folder["archive"]
+    )
+
+# Update Document Archive Status
+@app.patch("/document/{document_id}/archive", response_model=DocumentResponse)
+async def update_document_archive_status(document_id: str, status_update: ArchiveStatusUpdate):
+    # Convert 1 to True and 0 to False
+    archive_status = True if status_update.is_archived == 1 else False
+
+    # Update the archive status in the database
+    result = documents_collection.update_one(
+        {"_id": ObjectId(document_id)},
+        {"$set": {"archive": archive_status}}
+    )
+
+    # Check if the document exists
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Document not found")
+
+    # Return updated document details
+    document = documents_collection.find_one({"_id": ObjectId(document_id)})
+    return DocumentResponse(
+        document_id=str(document["_id"]),
+        document_name=document["document_name"],
+        folder_id=str(document["folder_id"]),
+        archive=document["archive"]
+    )
+
+@app.patch("/folder/{folder_id}/archive", response_model=FolderResponse)
+async def update_folder_archive_status(folder_id: str, status_update: ArchiveStatusUpdate):
+    # Convert 1 to True and 0 to False
+    archive_status = True if status_update.is_archived == 1 else False
+
+    # Update archive status in the database
+    result = folders_collection.update_one(
+        {"_id": ObjectId(folder_id)},
+        {"$set": {"archive": archive_status}}
+    )
+
+    # Check if folder exists
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Folder not found")
+
+    # Return updated folder details
+    folder = folders_collection.find_one({"_id": ObjectId(folder_id)})
+    return FolderResponse(
+        folder_id=str(folder["_id"]),
+        folder_name=folder["folder_name"],
+        archive=folder["archive"]
+    )
