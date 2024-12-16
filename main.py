@@ -1,143 +1,96 @@
-import os
-from fastapi import FastAPI, Request,HTTPException
-from typing import Union
-from pydantic import BaseModel
-import uuid
+from fastapi import FastAPI, HTTPException
+from typing import Optional
+from bson import ObjectId
 
-from fastapi.responses import HTMLResponse
-from fastapi.staticfiles import StaticFiles
-from fastapi.templating import Jinja2Templates
-from pymongo import MongoClient
+# Import database connection and models
+from db_connection import get_database
+from model import FolderRequest, DocumentRequest, FolderResponse, DocumentResponse, ArchiveStatusUpdate
 
 app = FastAPI()
 
-# Models for Document and Folder
+# MongoDB collections
+folders_collection, documents_collection = get_database()
 
-#Request Model
-class FolderRequest(BaseModel):
-    folder_name: str
+# Create Folder
+@app.post("/folder/", response_model=FolderResponse)
+async def create_folder(folder: FolderRequest):
+    # Check if folder with the same name already exists
+    folder_exists = folders_collection.find_one({"folder_name": folder.folder_name})
+    if folder_exists:
+        raise HTTPException(status_code=400, detail="Folder already exists")
 
-class DocumentRequest(BaseModel):
-    document_name: str
-    folder_id: str
-
-# Response Model
-class FolderResponse(BaseModel):
-    folder_id: str
-    folder_name: str
-    archive: bool
-
-class DocumentResponse(BaseModel):
-    document_id: str
-    document_name: str
-    folder_id: str
-    archive: bool
-
-# Archive Model
-class ArchiveStatusUpdate(BaseModel):
-    is_archived: bool
-
-
-#Directory
-Local_Storage = "./local_folders"
-if not os.path.exists(Local_Storage): os.makedirs((Local_Storage))
-
-
-
-""""
-# Endpoint for
-app.mount("/static", StaticFiles(directory="static"), name="static")
-templates = Jinja2Templates(directory="templates")
-
-
-@app.get("/",response_class=HTMLResponse)
-async def read_item(request: Request):
-    return templates.TemplateResponse("index.html", context={"request": request})
-    
-"""
-
-
-# Endpoint for hello with name and age
-@app.get("/hello/{name}")
-async def say_hello(name: str, age: int):
-    return {"name": name, "age": age}
-
-
-folders_db = {}
-documents_db = {}
-# folder create
-@app.post("/folder/")
-async def create_Folder(folder: FolderRequest):
-    unique_folder_id = str(uuid.uuid4())
-
-    if unique_folder_id  in folders_db:
-        raise HTTPException(status_code=404, detail="Folder already there")
-
-    folder_path =os.path.join(Local_Storage,  unique_folder_id)
-    try:
-        os.makedirs(folder_path)
-    except FileExistsError:
-        raise HTTPException(status_code=404, detail="Folder already there")
-
-    # Store
+    # Insert folder data into the database
     folder_data = {
-        "folder_id": unique_folder_id,
-        "folder_name": folder.name,
-        "archive": folder.archive,
+        "folder_name": folder.folder_name,
+        "archive": False
     }
+    result = folders_collection.insert_one(folder_data)
+    folder_id = str(result.inserted_id)
 
-    folders_db[unique_folder_id] = folder_data
-    return FolderResponse(         # Return FolderResponse
-        folder_id=unique_folder_id,
+    # Return folder details
+    return FolderResponse(
+        folder_id=folder_id,
         folder_name=folder.folder_name,
         archive=False
     )
 
-
-@app.post("/document/")
-async def create_Document(document: DocumentRequest):
-
-    unique_document_id = str(uuid.uuid4())
-
-    # Check folder
-    if document.folder_id not in folders_db:
+# Create Document
+@app.post("/document/", response_model=DocumentResponse)
+async def create_document(document: DocumentRequest):
+    # Validate that the folder exists
+    folder = folders_collection.find_one({"_id": ObjectId(document.folder_id)})
+    if not folder:
         raise HTTPException(status_code=404, detail="Folder not found")
 
-    # Store
+    # Insert document data into the database
     document_data = {
-        "document_id": unique_document_id,
         "document_name": document.document_name,
-        "folder_id": document.folder_id,
-        "archive": False # initial archive
+        "folder_id": ObjectId(document.folder_id),
+        "archive": False
     }
+    result = documents_collection.insert_one(document_data)
+    document_id = str(result.inserted_id)
 
-    documents_db[unique_document_id] = document_data
-
+    # Return document details
     return DocumentResponse(
-        document_id=unique_document_id,
+        document_id=document_id,
         document_name=document.document_name,
         folder_id=document.folder_id,
-        archive=False # initial archive
+        archive=False
     )
 
-@app.get("/folders/{name}")
+# Get Folder by Name
+@app.get("/folders/{folder_name}", response_model=Optional[FolderResponse])
 async def get_folder_by_name(folder_name: str):
-    # Search
-    for folder_id, folder in folders_db.items():
-        if folder["folder_name"].lower() == folder_name.lower():
-            return{
-                "folder_id": folder_id,
-                "folder_name": folder["folder_name"],
-                "archive": folder["archive"]
-            }
+    # Find folder by name
+    folder = folders_collection.find_one({"folder_name": folder_name})
+    if not folder:
+        raise HTTPException(status_code=404, detail="Folder not found")
 
-    raise HTTPException(status_code=404, detail="Folder not found")
+    # Return folder details
+    return FolderResponse(
+        folder_id=str(folder["_id"]),
+        folder_name=folder["folder_name"],
+        archive=folder["archive"]
+    )
 
+# Update Folder Archive Status
+@app.patch("/folder/{folder_id}/archive", response_model=FolderResponse)
+async def update_folder_archive_status(folder_id: str, status_update: ArchiveStatusUpdate):
+    # Update archive status in the database
+    result = folders_collection.update_one(
+        {"_id": ObjectId(folder_id)},
+        {"$set": {"archive": status_update.is_archived}}
+    )
 
+    # Check if folder exists
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Folder not found")
 
-
-@app.get("/items/{item_id}")
-def read_item(item_id: int, q: str | None = None):
-    return {"item_id": item_id, "q": q}
-
-
+    # Return updated folder details
+    folder = folders_collection.find_one({"_id": ObjectId(folder_id)})
+    return FolderResponse(
+        folder_id=str(folder["_id"]),
+        folder_name=folder["folder_name"],
+        archive=folder["archive"]
+    )
