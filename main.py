@@ -75,9 +75,6 @@ async def delete_folder(folder_id: str):
     # Delete the folder
     result = folders_collection.delete_one({"_id": str(folder_id)})
 
-    # Check
-    if result.deleted_count == 0:
-        raise HTTPException(status_code=404, detail="Folder not found")
 
     # Return the deleted folder details
     return FolderResponse(
@@ -102,10 +99,10 @@ async def update_folder_archive_status(folder_id: str, status_update: ArchiveSta
     if result.matched_count == 0:
         raise HTTPException(status_code=404, detail="Folder not found")
 
-    # Also update archive status for all documents in the folder
+    #  update archive status for all documents in folder
     documents_collection.update_many(
-        {"folder_id": str(folder_id)},  # Find all documents in this folder
-        {"$set": {"archive": archive_status}}  # Set their archive status
+        {"folder_id": str(folder_id)},
+        {"$set": {"archive": archive_status}}
     )
 
     # Return updated folder details
