@@ -177,6 +177,7 @@ async def update_document_archive_status(document_id: str, status_update: Archiv
     if result.matched_count == 0:
         raise HTTPException(status_code=404, detail="Document not found")
 
+
     # Return updated document details
     document = documents_collection.find_one({"_id": ObjectId(document_id)})
     return DocumentResponse(
