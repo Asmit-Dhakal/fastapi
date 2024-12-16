@@ -161,6 +161,7 @@ async def getDocumentByName(document_name: str):
     )
 
 
+
 # Update Document Archive Status
 @app.patch("/document/{document_id}/archive", response_model=DocumentResponse)
 async def update_document_archive_status(document_id: str, status_update: ArchiveStatusUpdate):
